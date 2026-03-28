@@ -1,14 +1,10 @@
-const dotenv = require("dotenv");
-const { createApp } = require("./app");
+import "dotenv/config";
+import app from "./app.js";
 
-dotenv.config();
+const PORT = Number(process.env.PORT || 3000);
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
 
-const port = Number(process.env.PORT || 3000);
-const aiServiceUrl = process.env.AI_SERVICE_URL || "http://localhost:8000";
-
-const app = createApp({ aiServiceUrl });
-
-app.listen(port, () => {
-  console.log(`Backend running on port ${port}`);
-  console.log(`AI service target: ${aiServiceUrl}`);
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
+  console.log(`AI service target: ${AI_SERVICE_URL}`);
 });

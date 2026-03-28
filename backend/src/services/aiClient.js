@@ -6,7 +6,7 @@ async function postJson(url, payload) {
   const response = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
@@ -17,17 +17,12 @@ async function postJson(url, payload) {
   return response.json();
 }
 
-async function transcribeAudio({ aiServiceUrl, audioUrl, phone }) {
+export async function transcribeAudio({ aiServiceUrl, audioUrl, phone }) {
   const url = buildUrl(aiServiceUrl, "/transcribe");
   return postJson(url, { audio_url: audioUrl, phone });
 }
 
-async function chat({ aiServiceUrl, message, phone }) {
+export async function chat({ aiServiceUrl, message, phone }) {
   const url = buildUrl(aiServiceUrl, "/chat");
   return postJson(url, { message, phone });
 }
-
-module.exports = {
-  transcribeAudio,
-  chat
-};

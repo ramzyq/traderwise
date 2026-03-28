@@ -1,19 +1,13 @@
-const express = require("express");
-const { createWebhookHandler } = require("./webhooks/whatsapp");
+import express from "express";
+import { verifyWebhook, handleWebhook } from "./webhooks/whatsapp.js";
 
-function createApp({ aiServiceUrl }) {
-  const app = express();
+const app = express();
+app.use(express.json());
 
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+app.get("/health", (_req, res) => res.json({ ok: true, service: "backend" }));
 
-  app.get("/health", (_req, res) => {
-    res.json({ ok: true, service: "backend" });
-  });
+// Meta webhook verification (GET) + incoming messages (POST)
+app.get("/webhook",  verifyWebhook);
+app.post("/webhook", handleWebhook);
 
-  app.post("/webhook", createWebhookHandler({ aiServiceUrl }));
-
-  return app;
-}
-
-module.exports = { createApp };
+export default app;
