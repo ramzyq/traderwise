@@ -15,6 +15,7 @@ class ChatResponse(BaseModel):
 class TranscribeRequest(BaseModel):
     audio_url: str = Field(..., min_length=1)
     phone: str = Field(..., min_length=1)
+    access_token: str | None = None  # Required for WhatsApp Cloud API media URLs
 
 
 class TranscribeResponse(BaseModel):

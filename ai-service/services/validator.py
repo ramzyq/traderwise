@@ -3,6 +3,8 @@ HARD_VIOLATION_PHRASES = ("i recommend", "you must")
 
 def post_process_response(text: str) -> str:
     updated = text.replace("you should", "one thing to consider")
+    # Strip markdown — WhatsApp renders plain text only
+    updated = updated.replace("**", "").replace("__", "").replace("##", "").replace("# ", "")
     updated = updated.strip()
     if not updated.endswith("?"):
         updated = f"{updated}?"

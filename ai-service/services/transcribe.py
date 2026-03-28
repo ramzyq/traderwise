@@ -25,7 +25,7 @@ def _audio_mime(url: str) -> tuple[str, str]:
     return ".ogg", "audio/ogg"  # default for Twilio voice notes
 
 
-def transcribe_from_audio_url(audio_url: str) -> tuple[str, str]:
+def transcribe_from_audio_url(audio_url: str, access_token: str | None = None) -> tuple[str, str]:
     """
     Downloads audio to a temporary file, transcribes via Whisper, then deletes immediately.
     Audio is never persisted beyond the duration of this call.
@@ -34,7 +34,11 @@ def transcribe_from_audio_url(audio_url: str) -> tuple[str, str]:
     if not groq_key:
         return "Voice note received. Please set GROQ_API_KEY to enable transcription.", "unknown"
 
-    audio_response = requests.get(audio_url, timeout=60)
+    headers = {}
+    if access_token:
+        headers["Authorization"] = f"Bearer {access_token}"
+
+    audio_response = requests.get(audio_url, headers=headers, timeout=60)
     audio_response.raise_for_status()
 
     suffix, mime_type = _audio_mime(audio_url)

@@ -30,7 +30,7 @@ def chat(request: ChatRequest) -> ChatResponse:
 @app.post("/transcribe", response_model=TranscribeResponse)
 def transcribe(request: TranscribeRequest) -> TranscribeResponse:
     try:
-        text, language = transcribe_from_audio_url(request.audio_url)
+        text, language = transcribe_from_audio_url(request.audio_url, access_token=request.access_token)
         return TranscribeResponse(text=text, language=language)
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Transcription failed: {exc}") from exc

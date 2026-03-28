@@ -3,6 +3,7 @@ import { verifyWebhook, handleWebhook } from "./webhooks/whatsapp.js";
 
 const app = express();
 app.use(express.json());
+app.use((_req, res, next) => { res.setHeader("ngrok-skip-browser-warning", "true"); next(); });
 
 app.get("/health", (_req, res) => res.json({ ok: true, service: "backend" }));
 
