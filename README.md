@@ -62,11 +62,13 @@ TraderWise builds a memory layer for each trader over time — no forms to fill 
 
 | Layer | Technology |
 |-------|-----------|
-| **Frontend** | WhatsApp Business API (Meta Cloud API) • SMS fallback via Hubtel |
-| **Backend** | Node.js + Express • PostgreSQL • Redis • Bull Queue |
-| **AI Pipeline** | OpenAI Whisper (speech-to-text) • Claude API (reasoning) • Helsinki-NLP / Google Translate (Twi translation) |
-| **Infrastructure** | Railway / Render • Supabase • Cloudflare R2 (audio storage) |
-| **Stretch Goal** | ElevenLabs TTS for voice responses back to trader |
+| **Messaging** | WhatsApp Business API (Meta Cloud API) |
+| **Webhook Server** | Go + net/http |
+| **AI Pipeline** | Python + FastAPI |
+| **Speech-to-Text** | Groq Whisper (whisper-large-v3-turbo) |
+| **Reasoning** | Claude API (claude-sonnet-4-6) — Ama persona |
+| **Translation** | Google Translate API (Twi ↔ English) |
+| **Database** | Supabase PostgreSQL • SQLite fallback for local dev |
 
 ---
 
@@ -107,35 +109,38 @@ R2_BUCKET_URL=            # Cloudflare R2 for audio storage
 ## Project Structure
 
 ```
-trader-wise/
-├── src/
-│   ├── index.js                  # Entry point / Express server
-│   ├── webhooks/
-│   │   └── whatsapp.js           # WhatsApp incoming message handler
-│   ├── pipeline/
-│   │   ├── transcribe.js         # Whisper speech-to-text
-│   │   ├── translate.js          # Twi ↔ English translation
-│   │   └── respond.js            # Claude API call + response builder
-│   ├── modules/
-│   │   ├── distressDetector.js   # Safety classifier (runs before Claude)
-│   │   ├── fraudAlert.js         # Fraud pattern recognition
-│   │   └── checkin.js            # Sunday weekly check-in scheduler
-│   ├── db/
-│   │   ├── traderProfile.js      # CRUD for trader profiles
-│   │   └── schema.sql            # PostgreSQL schema
+traderwise/
+├── ai-service/                        # Python FastAPI — AI pipeline
+│   ├── main.py                        # FastAPI app — /chat, /transcribe, /test
+│   ├── models.py                      # Pydantic request/response models
+│   ├── requirements.txt
+│   ├── .env.example
 │   ├── prompts/
-│   │   └── systemPrompt.js       # Claude system prompt builder
-│   └── utils/
-│       ├── queue.js              # Bull Queue for async audio processing
-│       └── storage.js            # Cloudflare R2 audio file handling
-├── tests/
-│   └── scenarios/                # Real trader scenarios for testing
-├── docs/
-│   ├── architecture.md
-│   ├── ethics.md
-│   └── demo-script.md
-├── .env.example
-└── README.md
+│   │   └── system_prompt.py           # Ama persona + 4-lens framework
+│   └── services/
+│       ├── chat_pipeline.py           # Main pipeline orchestrator
+│       ├── claude_client.py           # Anthropic API client
+│       ├── distress.py                # Distress classifier (bypasses Claude)
+│       ├── fraud.py                   # Fraud pattern recognizer
+│       ├── validator.py               # Response post-processor
+│       ├── transcribe.py              # Groq Whisper speech-to-text
+│       ├── translate.py               # Google Translate (Twi ↔ English)
+│       └── db.py                      # PostgreSQL + SQLite fallback
+│
+├── backend-go/                        # Go — WhatsApp webhook server
+│   ├── main.go                        # HTTP server + route setup
+│   ├── go.mod
+│   ├── handlers/
+│   │   └── webhook.go                 # Meta webhook verify + message handler
+│   └── services/
+│       ├── ai.go                      # Calls Python AI service
+│       ├── whatsapp.go                # Sends replies via Meta Graph API
+│       └── memory.go                  # In-memory conversation history
+│
+└── backend/                           # Node.js (reference — superseded by Go)
+    └── src/
+        └── db/
+            └── schema.sql             # PostgreSQL schema (traders, interactions, credit_customers)
 ```
 
 ---
