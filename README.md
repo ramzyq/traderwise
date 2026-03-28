@@ -24,12 +24,13 @@ Traders send a WhatsApp voice note in Twi. In under 8 seconds, they get a contex
 
 ```
 1. Trader sends WhatsApp voice note (OGG/OPUS) in Twi
-2. WhatsApp webhook receives the audio file
-3. Audio → OpenAI Whisper API (speech-to-text, Twi-capable)
-4. Transcription → Language detection module
-5. Twi → English translation for Claude processing
-6. English input + trader context profile → Claude API (reasoning engine)
-7. Claude response → translated back to Twi → WhatsApp reply
+2. Meta webhook → Go server receives the message
+3. Audio media ID resolved → Go calls Python /transcribe
+4. Groq Whisper (whisper-large-v3-turbo) → transcription + language detection
+5. If Twi: Google Translate → English for Claude processing
+6. Distress classifier + fraud checker run before Claude
+7. English input + trader profile → Claude API (Ama persona, 4-lens framework)
+8. Response validated → translated back to Twi if needed → WhatsApp reply
 ```
 
 ### The Trader Context Profile
@@ -76,33 +77,65 @@ TraderWise builds a memory layer for each trader over time — no forms to fill 
 
 ### Prerequisites
 
-- Node.js v18+
-- PostgreSQL
-- Redis
-- A WhatsApp Business API account (or Twilio sandbox for development)
+- Python 3.11+
+- Go 1.22+
+- A Meta WhatsApp Business API account
+- ngrok (for local webhook tunneling)
 
-### Installation
+### Running the AI Service
 
 ```bash
-git clone https://github.com/ramzyq/traderwise.git
-cd traderwise
-npm install
+cd ai-service
+python -m venv venv && source venv/Scripts/activate
+pip install -r requirements.txt
 cp .env.example .env
 # Fill in your API keys in .env
-npm run dev
+uvicorn main:app --reload --port 8000
 ```
+
+### Running the Go Webhook Server
+
+```bash
+cd backend-go
+go mod tidy
+go run main.go
+```
+
+### Exposing the Webhook (local dev)
+
+```bash
+ngrok http 3000 --request-header-add "ngrok-skip-browser-warning:true"
+```
+
+Set the ngrok HTTPS URL as your Meta webhook callback URL with `/webhook` appended.
 
 ### Environment Variables
 
+**`ai-service/.env`**
 ```bash
-ANTHROPIC_API_KEY=        # Claude API
-OPENAI_API_KEY=           # Whisper speech-to-text
-WHATSAPP_TOKEN=           # WhatsApp Business API token
-WHATSAPP_VERIFY_TOKEN=    # Webhook verification token
-DATABASE_URL=             # PostgreSQL connection string
-REDIS_URL=                # Redis connection string
-R2_BUCKET_URL=            # Cloudflare R2 for audio storage
+ANTHROPIC_API_KEY=        # Claude API (claude-sonnet-4-6)
+GROQ_API_KEY=             # Groq Whisper speech-to-text
+GOOGLE_TRANSLATE_KEY=     # Google Translate (Twi ↔ English)
+DATABASE_URL=             # Supabase PostgreSQL — falls back to SQLite if not set
+PORT=8000
 ```
+
+**`backend-go/.env`**
+```bash
+PORT=3000
+AI_SERVICE_URL=http://localhost:8000
+WHATSAPP_ACCESS_TOKEN=    # Meta WhatsApp access token (refreshes every 24h in dev)
+WHATSAPP_PHONE_NUMBER_ID= # Meta phone number ID
+WHATSAPP_VERIFY_TOKEN=    # Your chosen webhook verify token
+```
+
+### WhatsApp Commands
+
+| Command | Action |
+|---------|--------|
+| `start` | Welcome message + begin session |
+| `reset` | Clear conversation history |
+| `help`  | Show available commands |
 
 ---
 
