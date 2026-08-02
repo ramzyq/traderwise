@@ -6,3 +6,4 @@ psycopg[binary]>=3.2.0
 pytest==8.3.5
 celery==5.4.0
 redis==5.2.1
+pydantic-settings==2.6.1

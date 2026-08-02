@@ -1,0 +1,47 @@
+services:
+  - type: web
+    name: traderwise-ai
+    runtime: docker
+    dockerfilePath: ai-service/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: BROKER_URL
+        sync: false
+      - key: RESULT_BACKEND
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: WHATSAPP_ACCESS_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_VERIFY_TOKEN
+        sync: false
+      - key: WHATSAPP_APP_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+  - type: worker
+    name: traderwise-worker
+    runtime: docker
+    dockerfilePath: ai-service/Dockerfile
+    command: celery -A celery_app.celery_app worker --loglevel=info
+    envVars:
+      - key: BROKER_URL
+        sync: false
+      - key: RESULT_BACKEND
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: WHATSAPP_ACCESS_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_VERIFY_TOKEN
+        sync: false
+      - key: WHATSAPP_APP_SECRET
+        sync: false
+      - key: DATABASE_URL
+        sync: false
