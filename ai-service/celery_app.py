@@ -6,6 +6,7 @@ app = Celery(
     "traderwise",
     broker=os.getenv("BROKER_URL", "redis://localhost:6379/0"),
     backend=os.getenv("RESULT_BACKEND", "redis://localhost:6379/0"),
+    include=["tasks"],
 )
 
 app.conf.update(

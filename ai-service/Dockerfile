@@ -14,6 +14,7 @@ COPY main.py settings.py worker.py tasks.py celery_app.py ./
 COPY models/ ./models/
 COPY services/ ./services/
 COPY prompts/ ./prompts/
-COPY db/ ./db/
+RUN useradd --create-home appuser && chown -R appuser /app
+USER appuser
 EXPOSE 8000
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -56,7 +56,7 @@ class StartupSettings(BaseSettings):
     whatsapp_verify_token: str = ""
     whatsapp_app_secret: str = ""
     database_url: str = ""
-    broker_url: str = "redis://localhost:6379/0"
+    broker_url: str = ""
     result_backend: str = "redis://localhost:6379/0"
     celery_task_always_eager: bool = False
 

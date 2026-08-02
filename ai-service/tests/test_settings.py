@@ -57,11 +57,13 @@ def test_validate_startup_reports_missing_required(monkeypatch):
         "WHATSAPP_PHONE_NUMBER_ID",
         "WHATSAPP_VERIFY_TOKEN",
         "DATABASE_URL",
+        "BROKER_URL",
     ):
         monkeypatch.delenv(var, raising=False)
     missing = validate_startup_settings()
-    assert len(missing) == 5
+    assert len(missing) == 6
     assert "missing required env var: GROQ_API_KEY" in missing
+    assert "missing required env var: BROKER_URL" in missing
 
 
 def test_validate_startup_ok_when_required_set(monkeypatch):
