@@ -11,6 +11,7 @@ from models.webhook import WebhookPayload
 from services import meta
 from services.chat_pipeline import ChatPipeline
 from services.db import save_interaction, update_interaction_status
+from services.signature import is_valid_signature
 from services.transcribe import transcribe_from_audio_url
 from services.webhook_handler import WebhookHandler
 from settings import settings
@@ -123,6 +124,11 @@ def webhook_verify(
 
 @app.post("/webhook")
 async def webhook_receive(request: Request):
+    body_bytes = await request.body()
+    signature = request.headers.get("X-Hub-Signature-256", "")
+    app_secret = settings.whatsapp_app_secret
+    if app_secret and not is_valid_signature(app_secret, signature, body_bytes):
+        return Response(content="Unauthorized", status_code=401)
     try:
         raw = await request.json()
         payload = WebhookPayload.model_validate(raw)

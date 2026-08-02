@@ -15,6 +15,10 @@ class Settings:
         return os.getenv("WHATSAPP_VERIFY_TOKEN", "")
 
     @property
+    def whatsapp_app_secret(self) -> str:
+        return os.getenv("WHATSAPP_APP_SECRET", "")
+
+    @property
     def graph_base(self) -> str:
         return "https://graph.facebook.com/v19.0/"
 
