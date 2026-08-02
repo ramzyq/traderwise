@@ -1,5 +1,5 @@
 from prompts.system_prompt import build_system_prompt
-from services.claude_client import ClaudeClient
+from services.llm import provider
 from services.db import get_recent_interactions, get_trader_profile, save_interaction
 from services.distress import DISTRESS_REPLY, detect_distress
 from services.fraud import FRAUD_REPLY, detect_fraud_pattern
@@ -11,7 +11,7 @@ TWI_LANGUAGE_CODE = "tw"
 
 class ChatPipeline:
     def __init__(self) -> None:
-        self.claude = ClaudeClient()
+        self.llm = provider
 
     def run(self, message: str, phone: str) -> dict:
         distress_flag = detect_distress(message)
@@ -48,12 +48,12 @@ class ChatPipeline:
         english_message = to_english(message, source_language="tw") if is_twi else message
 
         system_prompt = build_system_prompt(trader_profile, recent_interactions)
-        raw_response = self.claude.generate(system_prompt=system_prompt, user_message=english_message)
+        raw_response = self.llm.generate(system_prompt=system_prompt, user_message=english_message)
         validated = post_process_response(raw_response)
 
         if has_hard_violation(validated):
             # Re-call only on hard violations to reduce latency.
-            raw_response = self.claude.generate(system_prompt=system_prompt, user_message=english_message)
+            raw_response = self.llm.generate(system_prompt=system_prompt, user_message=english_message)
             validated = post_process_response(raw_response)
 
         # Translate reply back to Twi if needed.
