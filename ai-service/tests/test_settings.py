@@ -16,10 +16,12 @@ def test_settings_reads_env(monkeypatch):
     monkeypatch.setenv("WHATSAPP_ACCESS_TOKEN", "tok_abc")
     monkeypatch.setenv("WHATSAPP_PHONE_NUMBER_ID", "12345")
     monkeypatch.setenv("WHATSAPP_VERIFY_TOKEN", "veriftok")
+    monkeypatch.setenv("WHATSAPP_APP_SECRET", "appsecret")
     s = Settings()
     assert s.whatsapp_access_token == "tok_abc"
     assert s.whatsapp_phone_number_id == "12345"
     assert s.whatsapp_verify_token == "veriftok"
+    assert s.whatsapp_app_secret == "appsecret"
 
 
 def test_settings_multilingual_defaults(monkeypatch):
