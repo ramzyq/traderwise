@@ -23,3 +23,8 @@ def test_openai():
 
 def test_unknown_defaults_to_groq():
     assert isinstance(get_llm_provider("whatever"), GroqProvider)
+
+
+def test_env_var_switches_provider(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "openai")
+    assert isinstance(get_llm_provider(), OpenAIProvider)

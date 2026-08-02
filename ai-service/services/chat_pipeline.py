@@ -1,5 +1,5 @@
 from prompts.system_prompt import build_system_prompt
-from services.llm import provider
+from services.llm import get_llm_provider
 from services.db import get_recent_interactions, get_trader_profile, save_interaction
 from services.distress import DISTRESS_REPLY, detect_distress
 from services.fraud import FRAUD_REPLY, detect_fraud_pattern
@@ -11,7 +11,7 @@ TWI_LANGUAGE_CODE = "tw"
 
 class ChatPipeline:
     def __init__(self) -> None:
-        self.llm = provider
+        self.llm = get_llm_provider()
 
     def run(self, message: str, phone: str) -> dict:
         distress_flag = detect_distress(message)
