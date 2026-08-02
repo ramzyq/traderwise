@@ -24,8 +24,8 @@ Traders send a WhatsApp voice note in Twi. In under 8 seconds, they get a contex
 
 ```
 1. Trader sends WhatsApp voice note (OGG/OPUS) in Twi
-2. Meta webhook → Go server receives the message
-3. Audio media ID resolved → Go calls Python /transcribe
+2. Meta webhook → FastAPI webhook server receives the message
+3. Audio media ID resolved → Python calls /transcribe
 4. Groq Whisper (whisper-large-v3-turbo) → transcription + language detection
 5. If Twi: Google Translate → English for Claude processing
 6. Distress classifier + fraud checker run before Claude
@@ -64,7 +64,7 @@ TraderWise builds a memory layer for each trader over time — no forms to fill 
 | Layer | Technology |
 |-------|-----------|
 | **Messaging** | WhatsApp Business API (Meta Cloud API) |
-| **Webhook Server** | Go + net/http |
+| **Webhook Server** | Python FastAPI (consolidated single service) |
 | **AI Pipeline** | Python + FastAPI |
 | **Speech-to-Text** | Groq Whisper (whisper-large-v3-turbo) |
 | **Reasoning** | Claude API (claude-sonnet-4-6) — Ama persona |
@@ -78,7 +78,6 @@ TraderWise builds a memory layer for each trader over time — no forms to fill 
 ### Prerequisites
 
 - Python 3.11+
-- Go 1.22+
 - A Meta WhatsApp Business API account
 - ngrok (for local webhook tunneling)
 
@@ -117,16 +116,10 @@ ANTHROPIC_API_KEY=        # Claude API (claude-sonnet-4-6)
 GROQ_API_KEY=             # Groq Whisper speech-to-text
 GOOGLE_TRANSLATE_KEY=     # Google Translate (Twi ↔ English)
 DATABASE_URL=             # Supabase PostgreSQL — falls back to SQLite if not set
-PORT=8000
-```
-
-**`backend-go/.env`**
-```bash
-PORT=3000
-AI_SERVICE_URL=http://localhost:8000
 WHATSAPP_ACCESS_TOKEN=    # Meta WhatsApp access token (refreshes every 24h in dev)
 WHATSAPP_PHONE_NUMBER_ID= # Meta phone number ID
 WHATSAPP_VERIFY_TOKEN=    # Your chosen webhook verify token
+PORT=8000
 ```
 
 ### WhatsApp Commands
@@ -143,8 +136,8 @@ WHATSAPP_VERIFY_TOKEN=    # Your chosen webhook verify token
 
 ```
 traderwise/
-├── ai-service/                        # Python FastAPI — AI pipeline
-│   ├── main.py                        # FastAPI app — /chat, /transcribe, /test
+├── ai-service/                        # Python FastAPI — full system (webhook + AI pipeline)
+│   ├── main.py                        # FastAPI app — /webhook, /health, /chat, /transcribe
 │   ├── models.py                      # Pydantic request/response models
 │   ├── requirements.txt
 │   ├── .env.example
@@ -160,17 +153,7 @@ traderwise/
 │       ├── translate.py               # Google Translate (Twi ↔ English)
 │       └── db.py                      # PostgreSQL + SQLite fallback
 │
-├── backend-go/                        # Go — WhatsApp webhook server
-│   ├── main.go                        # HTTP server + route setup
-│   ├── go.mod
-│   ├── handlers/
-│   │   └── webhook.go                 # Meta webhook verify + message handler
-│   └── services/
-│       ├── ai.go                      # Calls Python AI service
-│       ├── whatsapp.go                # Sends replies via Meta Graph API
-│       └── memory.go                  # In-memory conversation history
-│
-└── backend/                           # Node.js (reference — superseded by Go)
+└── backend/                           # Node.js (reference — superseded by ai-service)
     └── src/
         └── db/
             └── schema.sql             # PostgreSQL schema (traders, interactions, credit_customers)

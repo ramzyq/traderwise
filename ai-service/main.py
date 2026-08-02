@@ -1,8 +1,10 @@
+import json
 import os
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import Response
+from pydantic import ValidationError
 
 from models import ChatRequest, ChatResponse, TranscribeRequest, TranscribeResponse
 from models.webhook import WebhookPayload
@@ -46,7 +48,7 @@ def test_chat(request: ChatRequest) -> ChatResponse:
     return chat(request)
 
 
-def _verify_query(mode: str, verify_token: str, challenge: str) -> bool:
+def _verify_query(mode: str, verify_token: str) -> bool:
     return mode == "subscribe" and verify_token == settings.whatsapp_verify_token
 
 
@@ -88,15 +90,18 @@ def webhook_verify(
     hub_verify_token: str = Query(default="", alias="hub.verify_token"),
     hub_challenge: str = Query(default="", alias="hub.challenge"),
 ):
-    if _verify_query(hub_mode, hub_verify_token, hub_challenge):
+    if _verify_query(hub_mode, hub_verify_token):
         return Response(content=hub_challenge, media_type="text/plain")
     return Response(content="Forbidden", status_code=403)
 
 
 @app.post("/webhook")
 async def webhook_receive(request: Request):
-    raw = await request.json()
-    payload = WebhookPayload.model_validate(raw)
+    try:
+        raw = await request.json()
+        payload = WebhookPayload.model_validate(raw)
+    except (json.JSONDecodeError, ValidationError):
+        return {"status": "ok"}
     if payload.object == "whatsapp_business_account":
         webhook_handler.process(payload)
     return {"status": "ok"}

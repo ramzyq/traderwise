@@ -17,10 +17,6 @@ class WebhookHandler:
                 for msg in change.value.messages:
                     self._handle_message(msg)
 
-    def _dispatch(self, user_id, user_text, reply):
-        self.sender(user_id, reply)
-        self._save(user_id, user_text, reply)
-
     def _save(self, user_id, user_text, reply):
         history = memory.get(user_id)
         history.append(Message(role="user", content=user_text))
@@ -31,6 +27,9 @@ class WebhookHandler:
         user_id = msg.from_
         if msg.type == "text" and msg.text:
             text = msg.text.body.strip()
+            if text == "":
+                self.sender(user_id, "I could not understand that. Please try again.")
+                return
             command_reply = self._command_reply(text, user_id)
             if command_reply is not None:
                 self._save(user_id, text, command_reply)
