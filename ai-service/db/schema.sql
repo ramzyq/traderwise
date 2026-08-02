@@ -13,6 +13,8 @@ create table if not exists traders (
 create table if not exists interactions (
   id bigserial primary key,
   trader_phone text not null,
+  meta_message_id text unique,
+  status text not null default 'pending',
   incoming_message text,
   transcription text,
   claude_input text,
@@ -20,7 +22,8 @@ create table if not exists interactions (
   final_reply text,
   distress_flag boolean not null default false,
   fraud_flag boolean not null default false,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists credit_customers (

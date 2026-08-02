@@ -3,10 +3,10 @@ from models.webhook import WebhookPayload
 
 
 class FakeProcessor:
-    def handle_text(self, message, phone):
+    def handle_text(self, message, phone, message_id=None):
         return f"REPLY to {message}"
 
-    def handle_audio(self, audio_url, phone, access_token):
+    def handle_audio(self, audio_url, phone, access_token=None, message_id=None):
         return f"AUDIO REPLY {audio_url}"
 
 

@@ -12,6 +12,7 @@ class WebhookAudio(BaseModel):
 class WebhookMessage(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
+    id: str | None = None
     from_: str = Field(alias="from")
     type: str
     text: WebhookText | None = None
