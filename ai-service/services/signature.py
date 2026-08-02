@@ -8,6 +8,10 @@ def compute_signature(secret: str, body: bytes) -> str:
     return f"sha256={digest}"
 
 
+def _expected_hex(secret: str, body: bytes) -> str:
+    return hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+
+
 def is_valid_signature(secret: str, signature: str | None, body: bytes) -> bool:
     """Verify Meta's X-Hub-Signature-256 against the raw request body.
 
@@ -18,5 +22,5 @@ def is_valid_signature(secret: str, signature: str | None, body: bytes) -> bool:
     if not signature.startswith("sha256="):
         return False
     provided = signature.split("=", 1)[1]
-    expected = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+    expected = _expected_hex(secret, body)
     return secrets.compare_digest(provided, expected)
