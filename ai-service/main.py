@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Request
@@ -14,12 +16,21 @@ from services.db import save_interaction, update_interaction_status
 from services.signature import is_valid_signature
 from services.transcribe import transcribe_from_audio_url
 from services.webhook_handler import WebhookHandler
-from settings import settings
+from settings import settings, validate_startup_settings
 from tasks import process_webhook
 
 load_dotenv()
 
-app = FastAPI(title="TraderWise AI Service", version="0.1.0")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    missing = validate_startup_settings()
+    if missing:
+        sys.exit(" · ".join(missing))
+    yield
+
+
+app = FastAPI(title="TraderWise AI Service", version="0.1.0", lifespan=lifespan)
 pipeline = ChatPipeline()
 
 

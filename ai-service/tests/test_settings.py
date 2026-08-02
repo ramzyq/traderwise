@@ -1,4 +1,4 @@
-from settings import Settings
+from settings import Settings, validate_startup_settings
 
 
 def test_settings_defaults(monkeypatch):
@@ -42,3 +42,36 @@ def test_settings_multilingual_reads_env(monkeypatch):
     assert s.asr_provider == "khaya"
     assert s.asr_language == "gaa"
     assert s.translation_provider == "google"
+
+
+def test_validate_startup_skips_non_production(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "development")
+    assert validate_startup_settings() == []
+
+
+def test_validate_startup_reports_missing_required(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "production")
+    for var in (
+        "GROQ_API_KEY",
+        "WHATSAPP_ACCESS_TOKEN",
+        "WHATSAPP_PHONE_NUMBER_ID",
+        "WHATSAPP_VERIFY_TOKEN",
+        "DATABASE_URL",
+        "BROKER_URL",
+    ):
+        monkeypatch.delenv(var, raising=False)
+    missing = validate_startup_settings()
+    assert len(missing) == 6
+    assert "missing required env var: GROQ_API_KEY" in missing
+    assert "missing required env var: BROKER_URL" in missing
+
+
+def test_validate_startup_ok_when_required_set(monkeypatch):
+    monkeypatch.setenv("APP_ENV", "production")
+    monkeypatch.setenv("GROQ_API_KEY", "g")
+    monkeypatch.setenv("WHATSAPP_ACCESS_TOKEN", "t")
+    monkeypatch.setenv("WHATSAPP_PHONE_NUMBER_ID", "p")
+    monkeypatch.setenv("WHATSAPP_VERIFY_TOKEN", "v")
+    monkeypatch.setenv("DATABASE_URL", "postgres://x")
+    monkeypatch.setenv("BROKER_URL", "redis://localhost:6379/0")
+    assert validate_startup_settings() == []
