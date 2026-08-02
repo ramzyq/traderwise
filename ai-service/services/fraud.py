@@ -21,12 +21,11 @@ FRAUD_TERMS = {
     "ha mi shika",
     "shika ne",
     "nyɛ shika",
-    "kplhe ma shika",
     "shika nyina",
 }
 
 FRAUD_REPLY = (
-    "Yɛnhyɛ sika biara nkɔ baabiara nt ɛm. Bra yɛnhwehwɛ nea ɔpɛ no yie. "
+    "Yɛnhyɛ sika biara nkɔ baabiara ntɛm. Bra yɛnhwehwɛ nea ɔpɛ no yie. "
     "Wo nim obiara a ɔfirii saa nhyehyɛe yi koraa, ana? Yɛbɛboa wo dɛɛm."
 )
 
