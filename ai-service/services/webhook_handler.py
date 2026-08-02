@@ -1,4 +1,5 @@
 from models.webhook import WebhookPayload
+from services.db import message_exists
 from services.memory import Message, memory
 
 
@@ -24,6 +25,9 @@ class WebhookHandler:
         memory.save(user_id, history)
 
     def _handle_message(self, msg):
+        if msg.id and message_exists(msg.id):
+            # Duplicate Meta delivery — already recorded. Skip silently.
+            return
         user_id = msg.from_
         if msg.type == "text" and msg.text:
             text = msg.text.body.strip()

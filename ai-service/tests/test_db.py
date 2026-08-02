@@ -41,10 +41,19 @@ def test_save_without_meta_message_id_still_works(monkeypatch, tmp_path):
     assert db.message_exists("x") is False
 
 
-def test_chat_pipeline_skips_duplicate(monkeypatch, tmp_path):
+def test_webhook_handler_skips_duplicate(monkeypatch, tmp_path):
     _monkey(monkeypatch, tmp_path)
     db.save_interaction("555", None, "same", "o", "r", meta_message_id="dup.id", status="completed")
-    from services.chat_pipeline import ChatPipeline
-    pipe = ChatPipeline()
-    result = pipe.run("any message", "555", message_id="dup.id")
-    assert result.get("duplicate") is True
+    from models.webhook import WebhookPayload
+    from services.webhook_handler import WebhookHandler
+
+    sent = []
+    payload = WebhookPayload.model_validate({
+        "object": "whatsapp_business_account",
+        "entry": [{"changes": [{"value": {"messages": [
+            {"id": "dup.id", "from": "233550000001", "type": "text", "text": {"body": "hey"}}
+        ]}}]}],
+    })
+    handler = WebhookHandler(processor=object(), sender=lambda to, text: sent.append(text))
+    handler.process(payload)
+    assert sent == []

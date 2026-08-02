@@ -3,7 +3,6 @@ from services.llm import get_llm_provider
 from services.db import (
     get_recent_interactions,
     get_trader_profile,
-    message_exists,
     save_interaction,
     update_interaction_status,
 )
@@ -20,9 +19,6 @@ class ChatPipeline:
         self.llm = get_llm_provider()
 
     def run(self, message: str, phone: str, message_id: str | None = None) -> dict:
-        if message_id and message_exists(message_id):
-            return {"reply": "", "distress_flag": False, "fraud_flag": False, "duplicate": True}
-
         distress_flag = detect_distress(message)
         if distress_flag:
             save_interaction(
