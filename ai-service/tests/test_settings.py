@@ -20,3 +20,23 @@ def test_settings_reads_env(monkeypatch):
     assert s.whatsapp_access_token == "tok_abc"
     assert s.whatsapp_phone_number_id == "12345"
     assert s.whatsapp_verify_token == "veriftok"
+
+
+def test_settings_multilingual_defaults(monkeypatch):
+    monkeypatch.delenv("ASR_PROVIDER", raising=False)
+    monkeypatch.delenv("ASR_LANGUAGE", raising=False)
+    monkeypatch.delenv("TRANSLATION_PROVIDER", raising=False)
+    s = Settings()
+    assert s.asr_provider == "groq"
+    assert s.asr_language == "tw"
+    assert s.translation_provider == "khaya"
+
+
+def test_settings_multilingual_reads_env(monkeypatch):
+    monkeypatch.setenv("ASR_PROVIDER", "khaya")
+    monkeypatch.setenv("ASR_LANGUAGE", "gaa")
+    monkeypatch.setenv("TRANSLATION_PROVIDER", "google")
+    s = Settings()
+    assert s.asr_provider == "khaya"
+    assert s.asr_language == "gaa"
+    assert s.translation_provider == "google"
