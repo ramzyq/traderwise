@@ -54,3 +54,18 @@ def test_post_webhook_non_whatsapp_not_enqueued(client):
         assert resp.status_code == 200
         assert resp.json() == {"status": "ok"}
         assert not mock_delay.called
+
+
+def test_post_webhook_broker_down_still_returns_ok(client):
+    body = {
+        "object": "whatsapp_business_account",
+        "entry": [
+            {"changes": [{"value": {"messages": [
+                {"from": "233556000000", "type": "text", "text": {"body": "restock"}}
+            ]}}]}
+        ],
+    }
+    with patch("main.process_webhook.delay", side_effect=RuntimeError("broker down")):
+        resp = client.post("/webhook", json=body)
+        assert resp.status_code == 200
+        assert resp.json() == {"status": "ok"}

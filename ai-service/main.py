@@ -104,7 +104,10 @@ async def webhook_receive(request: Request):
     except (json.JSONDecodeError, ValidationError):
         return {"status": "ok"}
     if payload.object == "whatsapp_business_account":
-        process_webhook.delay(payload.model_dump())
+        try:
+            process_webhook.delay(payload.model_dump())
+        except Exception:
+            pass
     return {"status": "ok"}
 
 
