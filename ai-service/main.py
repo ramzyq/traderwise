@@ -54,17 +54,17 @@ def _verify_query(mode: str, verify_token: str) -> bool:
 
 
 class _WebhookProcessor:
-    def handle_text(self, message: str, phone: str) -> str:
-        result = pipeline.run(message=message, phone=phone)
+    def handle_text(self, message: str, phone: str, message_id: str | None = None) -> str:
+        result = pipeline.run(message=message, phone=phone, message_id=message_id)
         return result["reply"]
 
-    def handle_audio(self, audio_id: str, phone: str) -> str:
+    def handle_audio(self, audio_id: str, phone: str, message_id: str | None = None) -> str:
         try:
             audio_url = meta.resolve_media_url(settings.whatsapp_access_token, audio_id)
             text, _lang = transcribe_from_audio_url(audio_url, access_token=settings.whatsapp_access_token)
             if not text:
                 return "Could not transcribe the voice note. Please try again."
-            result = pipeline.run(message=text, phone=phone)
+            result = pipeline.run(message=text, phone=phone, message_id=message_id)
             return result["reply"]
         except Exception:
             return "Could not process the voice note. Please try again."

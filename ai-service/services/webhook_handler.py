@@ -35,11 +35,11 @@ class WebhookHandler:
                 self._save(user_id, text, command_reply)
                 self.sender(user_id, command_reply)
                 return
-            reply = self.processor.handle_text(text, user_id)
+            reply = self.processor.handle_text(text, user_id, message_id=msg.id)
             self._save(user_id, text, reply)
             self.sender(user_id, reply)
         elif msg.type == "audio" and msg.audio:
-            reply = self.processor.handle_audio(msg.audio.id, user_id)
+            reply = self.processor.handle_audio(msg.audio.id, user_id, message_id=msg.id)
             self.sender(user_id, reply)
 
     def _command_reply(self, text: str, user_id: str) -> str | None:
