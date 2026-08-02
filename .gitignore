@@ -146,3 +146,6 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# SDD scratch (per-plan briefs, reports, review packages, ledgers)
+.superpowers/
