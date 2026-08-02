@@ -13,6 +13,7 @@ from services.chat_pipeline import ChatPipeline
 from services.transcribe import transcribe_from_audio_url
 from services.webhook_handler import WebhookHandler
 from settings import settings
+from tasks import process_webhook
 
 load_dotenv()
 
@@ -103,7 +104,10 @@ async def webhook_receive(request: Request):
     except (json.JSONDecodeError, ValidationError):
         return {"status": "ok"}
     if payload.object == "whatsapp_business_account":
-        webhook_handler.process(payload)
+        try:
+            process_webhook.delay(payload.model_dump())
+        except Exception:
+            pass
     return {"status": "ok"}
 
 
