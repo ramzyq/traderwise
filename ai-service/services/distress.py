@@ -1,16 +1,32 @@
 DISTRESS_TERMS = {
+    # Twi (existing)
     "mensu adwene",
     "i am overwhelmed",
     "i can't cope",
     "i cant cope",
     "i am in distress",
-    "me ho ye den"
+    "me ho ye den",
+    # expanded Twi
+    "mesuro",
+    "mabre",
+    "me were ahye me",
+    "heaw pii wo me so",
+    # Ga
+    "mijɔɔɔ",
+    "kɛɛmɔ mi gbee",
+    "boɔ mi",
+    "mɔ ni yɛ mi he",
+    "mishaa",
+    # English
+    "i need help",
+    "i don't want to live",
+    "please help me",
+    "i feel unsafe",
 }
 
-
 DISTRESS_REPLY = (
-    "Mete wo ase. Wopɛ mmoa mprempren, na yebetumi agye ahotɔ nkakrankakra. "
-    "Hena na wobɛtumi afrɛ no seesei de agyina wo akyi?"
+    "Mete wo ase. Worekɔ dwene ye den yi ho, na mehiaa wo. "
+    "Wo ho nipa bi wɔ hɔ a wubetumi afrɛ no seesei ana?"
 )
 
 

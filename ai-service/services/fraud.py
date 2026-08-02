@@ -1,15 +1,33 @@
 FRAUD_TERMS = {
+    # English (existing)
     "market license",
     "send money now",
     "urgent payment",
     "registration fee",
-    "stranger asked"
+    "stranger asked",
+    # expanded English
+    "pay the fee",
+    "new license",
+    "pay deposit",
+    "unknown person to send",
+    "pay now or",
+    # Twi
+    "ma sika",
+    "sika na eto wo",
+    "yɛbɛma wo akwanya",
+    "kɔ sika hyɛ no nsa",
+    "sika foforo",
+    # Ga
+    "ha mi shika",
+    "shika ne",
+    "nyɛ shika",
+    "kplhe ma shika",
+    "shika nyina",
 }
 
-
 FRAUD_REPLY = (
-    "Yɛnhyɛ sika biara nkɔ baabiara ntɛm. Bra yɛnhwehwɛ nea ɔpɛ no yie. "
-    "Wo nim nipa no anaa woatumi ahwɛ ne nkrataa anaa?"
+    "Yɛnhyɛ sika biara nkɔ baabiara nt ɛm. Bra yɛnhwehwɛ nea ɔpɛ no yie. "
+    "Wo nim obiara a ɔfirii saa nhyehyɛe yi koraa, ana? Yɛbɛboa wo dɛɛm."
 )
 
 
