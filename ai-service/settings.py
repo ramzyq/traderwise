@@ -18,5 +18,17 @@ class Settings:
     def graph_base(self) -> str:
         return "https://graph.facebook.com/v19.0/"
 
+    @property
+    def asr_provider(self) -> str:
+        return os.getenv("ASR_PROVIDER", "groq")
+
+    @property
+    def asr_language(self) -> str:
+        return os.getenv("ASR_LANGUAGE", "tw")
+
+    @property
+    def translation_provider(self) -> str:
+        return os.getenv("TRANSLATION_PROVIDER", "khaya")
+
 
 settings = Settings()
