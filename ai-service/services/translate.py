@@ -27,18 +27,20 @@ def translate(text: str, target_language: str, source_language: str | None = Non
     if _provider() == "google":
         return _google_translate(text, target_language, source_language)
 
-    # Khaya provider (default). Map logical target to a Khaya lang pair.
+    # Khaya provider (default). English logical target -> Khaya pair.
     source = source_language or "en"
     pair = f"{source}-{target_language}"
-    translated = khaya.khaya_translate(text, pair)
+    try:
+        translated = khaya.khaya_translate(text, pair)
+    except Exception:
+        translated = ""
     if translated:
         return translated
     return _google_translate(text, target_language, source_language)
 
 
 def to_english(text: str, source_language: str | None = None) -> str:
-    if _provider() == "google" or not source_language:
-        return translate(text, "en", source_language)
+    return translate(text, "en", source_language)
     return translate(text, "en", source_language)
 
 

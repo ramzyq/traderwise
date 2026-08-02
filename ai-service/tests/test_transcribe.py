@@ -63,3 +63,21 @@ def test_no_text_returns_graceful_message(monkeypatch, tmp_path):
 
     text, lang = transcribe.transcribe_from_audio_url("http://x/x.ogg")
     assert "Could not transcribe" in text
+
+
+def test_provider_exception_triggers_fallback(monkeypatch, tmp_path):
+    monkeypatch.setenv("ASR_PROVIDER", "khaya")
+    audio_file = tmp_path / "note.ogg"
+    audio_file.write_bytes(b"abc")
+
+    def fake_download(url, token=None):
+        return str(audio_file)
+
+    monkeypatch.setattr(transcribe, "_download_audio", fake_download)
+    monkeypatch.setattr(
+        transcribe, "_transcribe_khaya", lambda p: (_ for _ in ()).throw(RuntimeError("khaya down"))
+    )
+    monkeypatch.setattr(transcribe, "_transcribe_groq", lambda p, m: ("groq rescue", "en"))
+
+    text, lang = transcribe.transcribe_from_audio_url("http://x/x.ogg")
+    assert text == "groq rescue"

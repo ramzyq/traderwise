@@ -42,4 +42,4 @@ def khaya_asr(audio_bytes: bytes, language: str) -> str:
         timeout=60,
     )
     resp.raise_for_status()
-    return resp.json()
+    return resp.text
