@@ -92,18 +92,12 @@ cp .env.example .env
 uvicorn main:app --reload --port 8000
 ```
 
-### Running the Go Webhook Server
-
-```bash
-cd backend-go
-go mod tidy
-go run main.go
-```
-
 ### Exposing the Webhook (local dev)
 
+The FastAPI service (which hosts `/webhook`, `/health`, `/chat`, `/transcribe`, and `/test`) runs on port 8000. Expose it so Meta can reach it:
+
 ```bash
-ngrok http 3000 --request-header-add "ngrok-skip-browser-warning:true"
+ngrok http 8000 --request-header-add "ngrok-skip-browser-warning:true"
 ```
 
 Set the ngrok HTTPS URL as your Meta webhook callback URL with `/webhook` appended.
