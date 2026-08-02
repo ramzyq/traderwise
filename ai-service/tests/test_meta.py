@@ -29,6 +29,32 @@ def test_send_message_success(monkeypatch):
     }
 
 
+def test_send_message_to_bsuid_uses_recipient(monkeypatch):
+    calls = {}
+
+    class FakeResp:
+        status_code = 200
+
+        def raise_for_status(self):
+            pass
+
+    def fake_post(url, json=None, headers=None, timeout=None):
+        calls["url"] = url
+        calls["json"] = json
+        return FakeResp()
+
+    monkeypatch.setattr(meta.requests, "post", fake_post)
+    meta.send_message("12345", "tok", "GH.1518733799519138", "hello")
+
+    assert calls["json"] == {
+        "messaging_product": "whatsapp",
+        "recipient": "GH.1518733799519138",
+        "type": "text",
+        "text": {"body": "hello"},
+    }
+    assert "to" not in calls["json"]
+
+
 def test_send_message_error(monkeypatch):
     class FakeResp:
         status_code = 500

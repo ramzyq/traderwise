@@ -1,16 +1,22 @@
+import re
+
 import requests
 
 GRAPH_BASE = "https://graph.facebook.com/v19.0/"
+_BSUID_RE = re.compile(r"^[A-Za-z]{2}\.[A-Za-z0-9]+$")
 
 
 def send_message(phone_number_id: str, access_token: str, to: str, text: str) -> None:
     url = f"{GRAPH_BASE}{phone_number_id}/messages"
     payload = {
         "messaging_product": "whatsapp",
-        "to": to,
         "type": "text",
         "text": {"body": text},
     }
+    if _BSUID_RE.match(to):
+        payload["recipient"] = to
+    else:
+        payload["to"] = to
     try:
         resp = requests.post(
             url,

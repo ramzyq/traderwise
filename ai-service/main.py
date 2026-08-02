@@ -149,7 +149,8 @@ async def webhook_receive(request: Request):
         try:
             process_webhook.delay(payload.model_dump())
         except Exception:
-            pass
+            import traceback
+            traceback.print_exc()
     return {"status": "ok"}
 
 

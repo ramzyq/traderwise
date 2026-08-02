@@ -7,6 +7,10 @@ __pycache__/
 *.db
 .env
 
+# Redis dump
+dump.rdb
+dump-*.rdb
+
 # Logs
 logs
 *.log

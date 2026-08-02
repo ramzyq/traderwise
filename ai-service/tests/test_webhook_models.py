@@ -31,6 +31,26 @@ def test_payload_text_message():
     assert msg.audio is None
 
 
+def test_payload_text_message_with_bsuid():
+    payload = WebhookPayload.model_validate({
+        "object": "whatsapp_business_account",
+        "entry": [
+            {"changes": [
+                {
+                    "value": {
+                        "messages": [
+                            {"from_user_id": "GH.1518733799519138", "type": "text", "text": {"body": "restock"}}
+                        ]
+                    }
+                }
+            ]}
+        ],
+    })
+    msg = payload.entry[0].changes[0].value.messages[0]
+    assert msg.from_ == "GH.1518733799519138"
+    assert msg.text.body == "restock"
+
+
 def test_payload_no_messages():
     payload = WebhookPayload.model_validate({
         "object": "whatsapp_business_account",

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class WebhookText(BaseModel):
@@ -13,7 +13,7 @@ class WebhookMessage(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
     id: str | None = None
-    from_: str = Field(alias="from")
+    from_: str = Field(validation_alias=AliasChoices("from", "from_user_id"))
     type: str
     text: WebhookText | None = None
     audio: WebhookAudio | None = None
